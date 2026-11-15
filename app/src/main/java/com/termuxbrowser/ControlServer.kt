@@ -115,7 +115,14 @@ class ControlServer(private val token: String) {
                 "(function(s){var e=document.querySelector(s);return e?e.innerText:null})(" +
                     JSONObject.quote(arg) + ")"
             )
-            "/minimize" -> onMain { if (BrowserHolder.moveToOverlay()) "ok" else "overlay permission chahiye" }
+            "/minimize" -> onMain {
+                // Activity ko background me bhejo (overlay me nahi, warna WebView reload hoga)
+                val act = currentActivity()
+                if (act != null) {
+                    act.moveTaskToBack(true)
+                    "ok"
+                } else "no activity"
+            }
             "/show" -> {
                 val ctx = BrowserHolder.appCtx
                 ctx.startActivity(

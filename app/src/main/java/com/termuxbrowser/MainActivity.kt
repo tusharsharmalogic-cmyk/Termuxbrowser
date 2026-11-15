@@ -69,6 +69,7 @@ class MainActivity : Activity() {
 
     override fun onStart() {
         super.onStart()
+        BrowserHolder.setCurrentActivity(this)
         BrowserHolder.attachToActivity(this, container)
         BrowserHolder.onUrlChange = { u -> runOnUiThread { if (!urlBar.hasFocus()) urlBar.setText(u) } }
         BrowserHolder.webView.url?.let { urlBar.setText(it) }
@@ -76,6 +77,7 @@ class MainActivity : Activity() {
 
     override fun onStop() {
         BrowserHolder.onUrlChange = null
+        BrowserHolder.setCurrentActivity(null)
         // WebView ko activity me hi rehne do — overlay move se WebView reload ho jata hai
         // (login/OTP state kho jaati hai). Background me JS still chalta hai.
         super.onStop()

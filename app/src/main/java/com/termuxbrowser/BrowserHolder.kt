@@ -52,6 +52,12 @@ object BrowserHolder {
     var autoOverlay = true                // Activity band/hide hote hi overlay me chala jaye
     var onUrlChange: ((String) -> Unit)? = null
 
+    private var currentActivityRef: java.lang.ref.WeakReference<Activity>? = null
+    fun currentActivity(): Activity? = currentActivityRef?.get()
+    fun setCurrentActivity(a: Activity?) {
+        currentActivityRef = if (a == null) null else java.lang.ref.WeakReference(a)
+    }
+
     private var inited = false
     private var bridgeOk = false
     private val bridgeExec = Executors.newCachedThreadPool()
@@ -202,12 +208,17 @@ object BrowserHolder {
     }
 
     fun attachToActivity(activity: Activity, container: FrameLayout) {
-        detachFromParent()
+        // Agar WebView pehle se isi container me hai to kuch mat karo
+        // (removeView + addView karne se WebView reload ho sakta hai)
+        if (inOverlay) detachFromParent()
         ctxWrapper.setBaseContext(activity)
-        container.addView(
-            webView,
-            FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
-        )
+        if (webView.parent !== container) {
+            (webView.parent as? ViewGroup)?.removeView(webView)
+            container.addView(
+                webView,
+                FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
+            )
+        }
         webView.onResume()
         webView.resumeTimers()
     }
