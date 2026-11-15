@@ -208,10 +208,9 @@ object BrowserHolder {
     }
 
     fun attachToActivity(activity: Activity, container: FrameLayout) {
-        // Agar WebView pehle se isi container me hai to kuch mat karo
-        // (removeView + addView karne se WebView reload ho sakta hai)
+        // IMPORTANT: setBaseContext() mat badlo — context change se WebView recreate (reload) ho jata hai.
+        // Sirf parent change karo. WebView hamesha appCtx pe rehta hai.
         if (inOverlay) detachFromParent()
-        ctxWrapper.setBaseContext(activity)
         if (webView.parent !== container) {
             (webView.parent as? ViewGroup)?.removeView(webView)
             container.addView(
@@ -227,7 +226,7 @@ object BrowserHolder {
     fun moveToOverlay(): Boolean {
         if (!Settings.canDrawOverlays(appCtx)) return false
         detachFromParent()
-        ctxWrapper.setBaseContext(appCtx)
+        // ctxWrapper.setBaseContext() mat badlo — context change se WebView reload hota hai
         val dm = appCtx.resources.displayMetrics
         val lp = WindowManager.LayoutParams(
             dm.widthPixels, dm.heightPixels,
@@ -249,6 +248,6 @@ object BrowserHolder {
 
     fun releaseActivity() {
         if (!inOverlay) detachFromParent()
-        ctxWrapper.setBaseContext(appCtx)
+        // ctxWrapper.setBaseContext() mat badlo — WebView reload na ho
     }
 }

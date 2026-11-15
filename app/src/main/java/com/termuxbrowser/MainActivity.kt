@@ -78,8 +78,12 @@ class MainActivity : Activity() {
     override fun onStop() {
         BrowserHolder.onUrlChange = null
         BrowserHolder.setCurrentActivity(null)
-        // WebView ko activity me hi rehne do — overlay move se WebView reload ho jata hai
-        // (login/OTP state kho jaati hai). Background me JS still chalta hai.
+        // Background me overlay me bhejo — Android overlay ko "visible" maanta hai,
+        // isliye WebView ki JS throttle nahi hoti aur agent script click kar sakti hai.
+        // (Base context nahi badla, isliye state/reload nahi hoga.)
+        if (BrowserHolder.autoOverlay && !isFinishing && Settings.canDrawOverlays(this)) {
+            BrowserHolder.moveToOverlay()
+        }
         super.onStop()
     }
 
