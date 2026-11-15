@@ -76,10 +76,8 @@ class MainActivity : Activity() {
 
     override fun onStop() {
         BrowserHolder.onUrlChange = null
-        // Home dabane / app switch par automatically background overlay me bhej do
-        if (BrowserHolder.autoOverlay && !isFinishing && Settings.canDrawOverlays(this)) {
-            BrowserHolder.moveToOverlay()
-        }
+        // WebView ko activity me hi rehne do — overlay move se WebView reload ho jata hai
+        // (login/OTP state kho jaati hai). Background me JS still chalta hai.
         super.onStop()
     }
 
