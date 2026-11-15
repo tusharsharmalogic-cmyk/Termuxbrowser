@@ -117,7 +117,7 @@ class ControlServer(private val token: String) {
             )
             "/minimize" -> onMain {
                 // Activity ko background me bhejo (overlay me nahi, warna WebView reload hoga)
-                val act = currentActivity()
+                val act = BrowserHolder.currentActivity()
                 if (act != null) {
                     act.moveTaskToBack(true)
                     "ok"
